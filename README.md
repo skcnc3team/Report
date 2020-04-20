@@ -1,5 +1,5 @@
 # 차렌탈 (rental)
-  . 차량을렌탈하는 업무
+  . 차량 (event storming)
  http://msaez.io/#/storming/Myy1Plyf3LVCBHQVEgbglycjTNT2/mine/d70b8a6edb8260352b4fbd030a2416e5/-M5LL7yFUj2kQweErT6d
   
 
