@@ -42,7 +42,7 @@
 
 # 서비스 시나리오
 
-배달의 민족 커버하기 - https://1sung.tistory.com/106
+배달의 민족 커버하기 - https://www.carplat.co.kr/
 
 기능적 요구사항
 1. 고객이 메뉴를 선택하여 예약한다
