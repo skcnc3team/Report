@@ -282,9 +282,8 @@ Transfer-Encoding: chunked
 }
 
 --> kafka_consumer
-{"eventType":"ReservationCanceled","timestamp":"20200421202025","id":3,"carId":"K5","customerNm":"Json","address":"SEOUL","status":null,"qty":1,"me":true}
-{"eventType":"DeliveryCanceled","timestamp":"20200421202025","id":1,"reservationId":null,"carId":"K5","customerNm":"Json","address":null,"status":"CANCEL","qty":null,"me":true}
-
+{"eventType":"ReservationChanged","timestamp":"20200421203501","id":4,"carId":"K5","customerNm":"AMMA","address":"SEOUL","status":null,"qty":1,"me":true}
+{"eventType":"DeliveryCompleted","timestamp":"20200421203501","id":1,"reservationId":null,"carId":"K5","customerNm":"AMMA","address":null,"status":"CHANGE","qty":null,"me":true}
 
 # 체크포인트
 
