@@ -506,14 +506,23 @@ public interface ReservationProcessingRepository extends PagingAndSortingReposit
 ```
 - 적용 후 REST API 의 테스트
 ```
-# app 서비스의 주문처리
-http localhost:8081/orders item="통닭"
 
-# store 서비스의 배달처리
-http localhost:8083/주문처리s orderId=1
+1.차렌탈업체가 렌탈용 차량을 등록한다
+http post http://localhost:8085/carProcessings carId=GRANDURE  qty=3
+http post http://localhost:8085/carProcessings carId=K5 qty=2
 
-# 주문 상태 확인
-http localhost:8081/orders/1
+2. 고객 차량을 선택하여 에약한다
+http post http://localhost:8081/reservationProcessings qty=1 carId=K5 customerNm=Json address="SEOUL"
+
+3. 고객이 결제한다
+http post http://localhost:8083/payProcessings qty=1 carId=K5 customerNm=Json
+
+4. 고객이 예약을 변경 후 배송완료 (이름변경)
+http PATCH http://localhost:8081/reservationProcessings/4 qty=1 customerNm=AMMA address=SEOUL carId=K5
+
+5. 고객이 예약을 취소한다
+http DELETE http://localhost:8081/reservationProcessings/3
+
 
 ```
 
@@ -632,17 +641,19 @@ public interface 결제이력Service {
 ```
 # 결제 (pay) 서비스를 잠시 내려놓음 (ctrl+c)
 
-#주문처리
-http localhost:8081/orders item=통닭 storeId=1   #Fail
-http localhost:8081/orders item=피자 storeId=2   #Fail
+#등록처리
+
+http post http://localhost:8085/carProcessings carId=GRANDURE  qty=3
+http post http://localhost:8085/carProcessings carId=K5 qty=2
 
 #결제서비스 재기동
 cd 결제
 mvn spring-boot:run
 
-#주문처리
-http localhost:8081/orders item=통닭 storeId=1   #Success
-http localhost:8081/orders item=피자 storeId=2   #Success
+#처리
+http post http://localhost:8085/carProcessings carId=GRANDURE  qty=3    #Success
+http post http://localhost:8085/carProcessings carId=K5 qty=2   #Success
+
 ```
 
 - 또한 과도한 요청시에 서비스 장애가 도미노 처럼 벌어질 수 있다. (서킷브레이커, 폴백 처리는 운영단계에서 설명한다.)
