@@ -43,20 +43,25 @@
 
 기능적 요구사항
 1.차렌탈업체가 렌탈용 차량을 등록한다
+
 http post http://localhost:8085/carProcessings carId=GRANDURE  qty=3
 http post http://localhost:8085/carProcessings carId=K5 qty=2
 
 
 2. 고객 차량을 선택하여 에약한다
+
 http post http://localhost:8081/reservationProcessings qty=1 carId=K5 customerNm=Json address="SEOUL"
 
 3. 고객이 결제한다
+
 http post http://localhost:8083/payProcessings qty=1 carId=K5 customerNm=Json
 
 4. 고객이 예약을 변경한다 (이름변경)
+
 http post http://localhost:8083/payProcessings qty=1 carId=K5 customerNm=AMMA
 
 5. 고객이 예약을 취소한다
+
 http DELETE http://localhost:8081/reservationProcessings/3
 
 
