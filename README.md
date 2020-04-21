@@ -746,6 +746,7 @@ http localhost:8080/orders     # 모든 주문의 상태가 "배송됨"으로 �
 # 운영
 
 ## CI/CD 설정
+![image](https://user-images.githubusercontent.com/27791796/79859728-6d830b00-840c-11ea-928d-fa2b230373c2.png)
 
 
 각 구현체들은 각자의 source repository 에 구성되었고, 사용한 CI/CD 플랫폼은 GCP를 사용하였으며, pipeline build script 는 각 프로젝트 폴더 이하에 cloudbuild.yml 에 포함되었다.
