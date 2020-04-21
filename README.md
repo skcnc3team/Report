@@ -42,12 +42,27 @@
 카플랫 커버하기 - https://www.carplat.co.kr/
 
 기능적 요구사항
-1. carstore (렌탈용 차량을 등록한다)
+1.차렌탈업체가 렌탈용 차량을 등록한다
+http post http://localhost:8085/carProcessings carId=GRANDURE  qty=3
+http post http://localhost:8085/carProcessings carId=K5 qty=2
 
 
-1. 고객이 메뉴를 선택하여 예약한다
-1. 고객이 결제한다
-1. 예약이 되면 예약 내역이 제휴사 업체에게 전달된다
+2. 고객 차량을 선택하여 에약한다
+http post http://localhost:8081/reservationProcessings qty=1 carId=K5 customerNm=Json address="SEOUL"
+
+3. 고객이 결제한다
+http post http://localhost:8083/payProcessings qty=1 carId=K5 customerNm=Json
+
+4. 고객이 예약을 변경한다 (이름변경)
+http post http://localhost:8083/payProcessings qty=1 carId=K5 customerNm=AMMA
+
+5. 고객이 예약을 취소한다
+http DELETE http://localhost:8081/reservationProcessings/3
+
+
+
+
+. 예약이 되면 예약 내역이 제휴사 업체에게 전달된다
 1. 제휴사 업체주인이 확인하여 렌트차로 배달 출발한다
 1. 고객이 예약을 취소할 수 있다
 1. 예약이 취소되면 배달이 취소된다
@@ -63,6 +78,196 @@
 1. 성능
     1. 고객이 자주 제휴점관리에서 확인할 수 있는 배달상태를 주문시스템(프론트엔드)에서 확인할 수 있어야 한다  CQRS
     1. 배달상태가 바뀔때마다 메시저 등으로 알림을 줄 수 있어야 한다  Event driven
+
+# 차렌탈배달 테스트 결과
+
+1. 렌탈차량 등록
+
+C:\rental\test>http get http://localhost:8085/carProcessings
+HTTP/1.1 200
+Content-Type: application/hal+json;charset=UTF-8
+Date: Tue, 21 Apr 2020 10:58:04 GMT
+Transfer-Encoding: chunked
+
+{
+    "_embedded": {
+        "carProcessings": [
+            {
+                "_links": {
+                    "carProcessing": {
+                        "href": "http://localhost:8085/carProcessings/1"
+                    },
+                    "self": {
+                        "href": "http://localhost:8085/carProcessings/1"
+                    }
+                },
+                "carId": "K5",
+                "qty": 2
+            },
+            {
+                "_links": {
+                    "carProcessing": {
+                        "href": "http://localhost:8085/carProcessings/2"
+                    },
+                    "self": {
+                        "href": "http://localhost:8085/carProcessings/2"
+                    }
+                },
+                "carId": "GRANDURE",
+                "qty": 3
+            }
+        ]
+    },
+    "_links": {
+        "profile": {
+            "href": "http://localhost:8085/profile/carProcessings"
+        },
+        "self": {
+            "href": "http://localhost:8085/carProcessings{?page,size,sort}",
+            "templated": true
+        }
+    },
+    "page": {
+        "number": 0,
+        "size": 20,
+        "totalElements": 2,
+        "totalPages": 1
+    }
+}
+
+
+2. 고객 차량 예약 결과
+C:\rental\test>http post http://localhost:8081/reservationProcessings qty=1 carId=K5 customerNm=Json address="SEOUL"
+HTTP/1.1 201
+Content-Type: application/json;charset=UTF-8
+Date: Tue, 21 Apr 2020 11:14:14 GMT
+Location: http://localhost:8081/reservationProcessings/3
+Transfer-Encoding: chunked
+
+{
+    "_links": {
+        "reservationProcessing": {
+            "href": "http://localhost:8081/reservationProcessings/3"
+        },
+        "self": {
+            "href": "http://localhost:8081/reservationProcessings/3"
+        }
+    },
+    "address": "SEOUL",
+    "carId": "K5",
+    "customerNm": "Json",
+    "qty": 1,
+    "status": null
+}
+
+3. 고객 결제 결과
+
+C:\rental\test>http post http://localhost:8083/payProcessings qty=1 carId=K5 customerNm=Json
+HTTP/1.1 201
+Content-Type: application/json;charset=UTF-8
+Date: Tue, 21 Apr 2020 11:16:13 GMT
+Location: http://localhost:8083/payProcessings/2
+Transfer-Encoding: chunked
+
+{
+    "_links": {
+        "payProcessing": {
+            "href": "http://localhost:8083/payProcessings/2"
+        },
+        "self": {
+            "href": "http://localhost:8083/payProcessings/2"
+        }
+    },
+    "carId": "K5",
+    "customerNm": "Json",
+    "qty": 1,
+    "reervationId": null
+}
+
+4. 고객이 예약을 변경한 결과 (이름)
+ -- 변경전
+ C:\rental\test>http post http://localhost:8083/payProcessings qty=1 carId=K5 customerNm=Json
+HTTP/1.1 201
+Content-Type: application/json;charset=UTF-8
+Date: Tue, 21 Apr 2020 11:23:59 GMT
+Location: http://localhost:8083/payProcessings/3
+Transfer-Encoding: chunked
+
+{
+    "_links": {
+        "payProcessing": {
+            "href": "http://localhost:8083/payProcessings/3"
+        },
+        "self": {
+            "href": "http://localhost:8083/payProcessings/3"
+        }
+    },
+    "carId": "K5",
+    "customerNm": "Json",
+    "qty": 1,
+    "reervationId": null
+}
+
+-- 변경 후
+
+C:\rental\test>http post http://localhost:8083/payProcessings qty=1 carId=K5 customerNm=AMMA
+HTTP/1.1 201
+Content-Type: application/json;charset=UTF-8
+Date: Tue, 21 Apr 2020 11:24:27 GMT
+Location: http://localhost:8083/payProcessings/4
+Transfer-Encoding: chunked
+
+{
+    "_links": {
+        "payProcessing": {
+            "href": "http://localhost:8083/payProcessings/4"
+        },
+        "self": {
+            "href": "http://localhost:8083/payProcessings/4"
+        }
+    },
+    "carId": "K5",
+    "customerNm": "AMMA",
+    "qty": 1,
+    "reervationId": null
+}
+
+5. 고객 예약 취소 결과
+C:\rental\test>http DELETE http://localhost:8081/reservationProcessings/3
+HTTP/1.1 204
+Date: Tue, 21 Apr 2020 11:20:25 GMT
+
+
+C:\rental\test>http get http://localhost:8081/reservationProcessings
+HTTP/1.1 200
+Content-Type: application/hal+json;charset=UTF-8
+Date: Tue, 21 Apr 2020 11:21:53 GMT
+Transfer-Encoding: chunked
+
+{
+    "_embedded": {
+        "reservationProcessings": []
+    },
+    "_links": {
+        "profile": {
+            "href": "http://localhost:8081/profile/reservationProcessings"
+        },
+        "self": {
+            "href": "http://localhost:8081/reservationProcessings{?page,size,sort}",
+            "templated": true
+        }
+    },
+    "page": {
+        "number": 0,
+        "size": 20,
+        "totalElements": 0,
+        "totalPages": 0
+    }
+}
+
+--> kafka_consumer
+{"eventType":"ReservationCanceled","timestamp":"20200421202025","id":3,"carId":"K5","customerNm":"Json","address":"SEOUL","status":null,"qty":1,"me":true}
+{"eventType":"DeliveryCanceled","timestamp":"20200421202025","id":1,"reservationId":null,"carId":"K5","customerNm":"Json","address":null,"status":"CANCEL","qty":null,"me":true}
 
 
 # 체크포인트
