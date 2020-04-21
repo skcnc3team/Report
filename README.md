@@ -48,31 +48,30 @@ http post http://localhost:8085/carProcessings carId=GRANDURE  qty=3
 http post http://localhost:8085/carProcessings carId=K5 qty=2
 
 
+
 2. 고객 차량을 선택하여 에약한다
 
 http post http://localhost:8081/reservationProcessings qty=1 carId=K5 customerNm=Json address="SEOUL"
+
 
 3. 고객이 결제한다
 
 http post http://localhost:8083/payProcessings qty=1 carId=K5 customerNm=Json
 
-4. 고객이 예약을 변경한다 (이름변경)
 
-http post http://localhost:8083/payProcessings qty=1 carId=K5 customerNm=AMMA
+4. 고객이 예약을 변경 후 배송완료 (이름변경)
+
+http PATCH http://localhost:8081/reservationProcessings/4 qty=1 customerNm=AMMA address=SEOUL carId=K5
+
 
 5. 고객이 예약을 취소한다
 
 http DELETE http://localhost:8081/reservationProcessings/3
 
 
+6. 고객이 예약상태를 중간중간 조회한다
+7. 예약상태가 바뀔 때 마다 카톡으로 알림을 보낸다
 
-
-. 예약이 되면 예약 내역이 제휴사 업체에게 전달된다
-1. 제휴사 업체주인이 확인하여 렌트차로 배달 출발한다
-1. 고객이 예약을 취소할 수 있다
-1. 예약이 취소되면 배달이 취소된다
-1. 고객이 예약상태를 중간중간 조회한다
-1. 예약상태가 바뀔 때 마다 카톡으로 알림을 보낸다
 
 비기능적 요구사항
 1. 트랜잭션
@@ -191,51 +190,61 @@ Transfer-Encoding: chunked
 
 4. 고객이 예약을 변경한 결과 (이름)
  -- 변경전
- C:\rental\test>http post http://localhost:8083/payProcessings qty=1 carId=K5 customerNm=Json
-HTTP/1.1 201
-Content-Type: application/json;charset=UTF-8
-Date: Tue, 21 Apr 2020 11:23:59 GMT
-Location: http://localhost:8083/payProcessings/3
+
+C:\rental\test>http get http://localhost:8081/reservationProcessings
+HTTP/1.1 200
+Content-Type: application/hal+json;charset=UTF-8
+Date: Tue, 21 Apr 2020 11:34:45 GMT
 Transfer-Encoding: chunked
 
 {
-    "_links": {
-        "payProcessing": {
-            "href": "http://localhost:8083/payProcessings/3"
-        },
-        "self": {
-            "href": "http://localhost:8083/payProcessings/3"
-        }
+    "_embedded": {
+        "reservationProcessings": [
+            {
+                "_links": {
+                    "reservationProcessing": {
+                        "href": "http://localhost:8081/reservationProcessings/4"
+                    },
+                    "self": {
+                        "href": "http://localhost:8081/reservationProcessings/4"
+                    }
+                },
+                "address": "SEOUL",
+                "carId": "K5",
+                "customerNm": "Json",
+                "qty": 1,
+                "status": null
+            }
+        ]
     },
-    "carId": "K5",
-    "customerNm": "Json",
-    "qty": 1,
-    "reervationId": null
-}
 
 -- 변경 후
 
-C:\rental\test>http post http://localhost:8083/payProcessings qty=1 carId=K5 customerNm=AMMA
-HTTP/1.1 201
+C:\rental\test>http PATCH http://localhost:8081/reservationProcessings/4 qty=1 customerNm=AMMA address=SEOUL carId=K5
+HTTP/1.1 200
 Content-Type: application/json;charset=UTF-8
-Date: Tue, 21 Apr 2020 11:24:27 GMT
-Location: http://localhost:8083/payProcessings/4
+Date: Tue, 21 Apr 2020 11:35:01 GMT
 Transfer-Encoding: chunked
 
 {
     "_links": {
-        "payProcessing": {
-            "href": "http://localhost:8083/payProcessings/4"
+        "reservationProcessing": {
+            "href": "http://localhost:8081/reservationProcessings/4"
         },
         "self": {
-            "href": "http://localhost:8083/payProcessings/4"
+            "href": "http://localhost:8081/reservationProcessings/4"
         }
     },
+    "address": "SEOUL",
     "carId": "K5",
     "customerNm": "AMMA",
     "qty": 1,
-    "reervationId": null
+    "status": null
 }
+
+-->kafka consumer 
+{"eventType":"ReservationChanged","timestamp":"20200421203501","id":4,"carId":"K5","customerNm":"AMMA","address":"SEOUL","status":null,"qty":1,"me":true}
+{"eventType":"DeliveryCompleted","timestamp":"20200421203501","id":1,"reservationId":null,"carId":"K5","customerNm":"AMMA","address":null,"status":"CHANGE","qty":null,"me":true}
 
 5. 고객 예약 취소 결과
 C:\rental\test>http DELETE http://localhost:8081/reservationProcessings/3
