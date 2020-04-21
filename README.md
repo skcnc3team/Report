@@ -1,3 +1,4 @@
+![주석 2020-04-21 195610](https://user-images.githubusercontent.com/27791796/79858758-de292800-840a-11ea-8255-dcc517e9088d.png)
 
 # 차렌탈 (rental)
   . 차량 (event storming)
