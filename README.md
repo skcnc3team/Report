@@ -88,6 +88,7 @@ http DELETE http://localhost:8081/reservationProcessings/3
 # 차렌탈배달 테스트 결과
 
 1. 렌탈차량 등록
+
 C:\rental\test>http get http://localhost:8085/carProcessings
 HTTP/1.1 200
 Content-Type: application/hal+json;charset=UTF-8
